@@ -26,7 +26,7 @@ namespace FilmesAPI.Controllers
 
 
         [HttpPost]
-        public IActionResult AdicionaCinema([FromBody] CreateEnderecoDto cinemaDto)
+        public IActionResult AdicionaCinema([FromBody] CreateCinemaDto cinemaDto)
         {
             Cinema cinema = _mapper.Map<Cinema>(cinemaDto);
             _context.Cinemas.Add(cinema);
@@ -46,14 +46,14 @@ namespace FilmesAPI.Controllers
             Cinema cinema = _context.Cinemas.FirstOrDefault(cinema => cinema.Id == id);
             if (cinema != null)
             {
-                ReadEnderecoDto cinemaDto = _mapper.Map<ReadEnderecoDto>(cinema);
+                ReadCinemaDto cinemaDto = _mapper.Map<ReadCinemaDto>(cinema);
                 return Ok(cinemaDto);
             }
             return NotFound();
         }
 
         [HttpPut("{id}")]
-        public IActionResult AtualizaCinema(int id, [FromBody] UpdateEnderecoDto cinemaDto)
+        public IActionResult AtualizaCinema(int id, [FromBody] UpdateCinemaDto cinemaDto)
         {
             Cinema cinema = _context.Cinemas.FirstOrDefault(cinema => cinema.Id == id);
             if (cinema == null)
