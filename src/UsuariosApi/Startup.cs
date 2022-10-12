@@ -1,8 +1,7 @@
-using FilmesAPI.Data;
-using FilmesAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,8 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UsuariosApi.Data;
+using UsuariosApi.Services;
 
-namespace FilmesAPI
+namespace UsuariosApi
 {
     public class Startup
     {
@@ -29,22 +30,29 @@ namespace FilmesAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<UserDbContext>(options =>
+            options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection")));
 
-            services.AddDbContext<AppDbContext>(x =>
-            x.UseLazyLoadingProxies().UseMySQL(Configuration.GetConnectionString("CinemaConnection")));
-            services.AddScoped<FilmeService, FilmeService>();
-            services.AddScoped<CinemaService, CinemaService>();
-            services.AddScoped<EnderecoService, EnderecoService>();
-            services.AddScoped<GerenteService, GerenteService>();
-            services.AddScoped<SessaoService, SessaoService>();
+            services.AddIdentity<IdentityUser<int>, IdentityRole<int>>()
+                .AddEntityFrameworkStores<UserDbContext>();
+
+            services.AddScoped<CadastroService, CadastroService>();
+
             services.AddControllers();
-            
-            //services.AddSwaggerGen(c =>
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            /*CASO PRECISE ALTERAR O PADRÂO DE SENHA DO IDENTITY*/
+            //services.Configure<IdentityOptions>(options =>
             //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FilmesAPI", Version = "v1" });
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequiredLength = 8;
             //});
 
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UsuariosApi", Version = "v1" });
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +62,7 @@ namespace FilmesAPI
             {
                 app.UseDeveloperExceptionPage();
                 //app.UseSwagger();
-                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FilmesAPI v1"));
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "UsuariosApi v1"));
             }
 
             app.UseHttpsRedirection();
